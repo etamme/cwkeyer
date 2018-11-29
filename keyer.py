@@ -3,7 +3,6 @@ import sys
 import serial
 import argparse
 
-ser = ditspeed = dahspeed = charspace = wordspace = ""
 chars =   {'A':'.-',
            'B':'-...',
            'C':'-.-.',
@@ -98,32 +97,23 @@ def paris():
     count+=1
     print(count)
 
-def main(argv):
-   # set defaults
-   text = ''
-   wpm = 20
-   global ser,ditspeed,dahspeed,charspace,wordspace,pin
-   parser = argparse.ArgumentParser(description='CW keyer for serial interface.')
-   parser.add_argument('-d', '--device', dest='device', default='/dev/ttyUSB0', help='Path to serial device. (default: /dev/ttyUSB0)')
-   parser.add_argument('-w', '--wpm', dest='wpm', type=int, default=20, help='CW keying speed in words per minutes. (default: 20 wpm)')
-   parser.add_argument('-t', '--text', dest='text', required=True, help='Text to transmit. Surround multiple words by quotes.')
-   parser.add_argument('--dtr', dest='dtr', action='store_true', help='Use DTR pin instead of RTS pin for keying')
-   args = parser.parse_args()
+parser = argparse.ArgumentParser(description='CW keyer for serial interface.')
+parser.add_argument('-d', '--device', dest='device', default='/dev/ttyUSB0', help='Path to serial device. (default: /dev/ttyUSB0)')
+parser.add_argument('-w', '--wpm', dest='wpm', type=int, default=20, help='CW keying speed in words per minutes. (default: 20 wpm)')
+parser.add_argument('-t', '--text', dest='text', required=True, help='Text to transmit. Surround multiple words by quotes.')
+parser.add_argument('--dtr', dest='dtr', action='store_true', help='Use DTR pin instead of RTS pin for keying')
+args = parser.parse_args()
 
-   if args.dtr:
-       pin='DTR'
-   else:
-       pin='RTS'
+if args.dtr:
+   pin='DTR'
+else:
+   pin='RTS'
 
-   ser = serial.Serial(args.device, 9600);
-   ditspeed = (1200.0 / float(args.wpm)) / 1000.0
-   dahspeed = ditspeed * 3
-   charspace = ditspeed * 1
-   wordspace = ditspeed * 7
+ser = serial.Serial(args.device, 9600);
+ditspeed = (1200.0 / float(args.wpm)) / 1000.0
+dahspeed = ditspeed * 3
+charspace = ditspeed * 1
+wordspace = ditspeed * 7
 
-   for w in args.text.upper().split():
-       word(w)
-
-if __name__ == "__main__":
-   main(sys.argv[1:])
-
+for w in args.text.upper().split():
+   word(w)
