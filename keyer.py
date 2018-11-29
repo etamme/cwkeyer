@@ -81,7 +81,13 @@ def dit():
 
 def word(w):
   for c in w:
-      code = chars[c]
+      try:
+          code = chars[c]
+      except KeyError:
+          # FIXME: Use proper logging facility here
+          print('Skipping unknown character %s' % c)
+          continue
+
       for dahdit in code:
         if dahdit == '-':
           dah()
