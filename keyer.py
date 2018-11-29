@@ -49,34 +49,18 @@ def wordgap():
   time.sleep(wordspace)
 
 def dah():
-  global pin
-  if pin=="RTS":
-    ser.setRTS(False)
-    ser.setRTS(True)
-  else: 
-    ser.setDTR(False)
-    ser.setDTR(True)
+  cw_key(False)
+  cw_key(True)
   time.sleep(dahspeed)
-  if pin=="RTS":
-    ser.setRTS(False)
-  else:
-    ser.setDTR(False)
+  cw_key(False)
   time.sleep(ditspeed)
 
 
 def dit():
-  global pin
-  if pin=="RTS":
-    ser.setRTS(False)
-    ser.setRTS(True)
-  else: 
-    ser.setDTR(False)
-    ser.setDTR(True)
+  cw_key(False)
+  cw_key(True)
   time.sleep(ditspeed)
-  if pin=="RTS":
-    ser.setRTS(False)
-  else:
-    ser.setDTR(False)
+  cw_key(False)
   time.sleep(ditspeed)
 
 def word(w):
@@ -104,12 +88,13 @@ parser.add_argument('-t', '--text', dest='text', required=True, help='Text to tr
 parser.add_argument('--dtr', dest='dtr', action='store_true', help='Use DTR pin instead of RTS pin for keying')
 args = parser.parse_args()
 
+ser = serial.Serial(args.device, 9600)
 if args.dtr:
-   pin='DTR'
+   cw_key = ser.setDTR
 else:
-   pin='RTS'
+   cw_key = ser.setRTS
 
-ser = serial.Serial(args.device, 9600);
+
 ditspeed = (1200.0 / float(args.wpm)) / 1000.0
 dahspeed = ditspeed * 3
 charspace = ditspeed * 1
