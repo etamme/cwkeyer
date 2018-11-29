@@ -95,7 +95,7 @@ def paris():
   while True:
     word("PARIS")
     count+=1
-    print count
+    print(count)
 
 def main(argv):
    # set defaults
@@ -107,7 +107,7 @@ def main(argv):
    try:
       opts, args = getopt.getopt(argv,"d:w:t:p",["d=","w=","t=","p="])
    except getopt.GetoptError:
-         print 'test.py -d <device> -w <wpm> -t <text> -p <pin - R for RTS, D for DTR>'
+         print('test.py -d <device> -w <wpm> -t <text> -p <pin - R for RTS, D for DTR>')
          sys.exit(2)
    for opt, arg in opts:
       if opt in ("-d", "--device"):
@@ -118,13 +118,13 @@ def main(argv):
          text = arg.upper()
       elif opt in ("-p", "--pin"):
          pinarg = arg.upper()
-         print opt
-         print arg
+         print(opt)
+         print(arg)
          if pinarg == "R":
-           print "set pin RTS"
+           print("set pin RTS")
            pin="RTS"
          elif pinarg == "D":
-           print "set pin DTR"
+           print("set pin DTR")
            pin="DTR"
       
          
