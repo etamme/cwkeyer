@@ -102,10 +102,9 @@ def main(argv):
    # set defaults
    text = ''
    wpm = 20
-   device = '/dev/ttyUSB0'
    global ser,ditspeed,dahspeed,charspace,wordspace,pin
    parser = argparse.ArgumentParser(description='CW keyer for serial interface.')
-   parser.add_argument('-d', '--device', dest='device', required=True, help='Path to serial device. (e.g. /dev/ttyUSB0)')
+   parser.add_argument('-d', '--device', dest='device', default='/dev/ttyUSB0', help='Path to serial device. (default: /dev/ttyUSB0)')
    parser.add_argument('-w', '--wpm', dest='wpm', type=int, default=20, help='CW keying speed in words per minutes. (default: 20 wpm)')
    parser.add_argument('-t', '--text', dest='text', required=True, help='Text to transmit. Surround multiple words by quotes.')
    parser.add_argument('--dtr', dest='dtr', action='store_true', help='Use DTR pin instead of RTS pin for keying')
