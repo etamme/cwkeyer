@@ -52,17 +52,17 @@ def wordgap():
   time.sleep(wordspace)
 
 def dah():
-  cw_key(key_release)
-  cw_key(key_press)
+  cw_key(key_open)
+  cw_key(key_close)
   time.sleep(dahspeed)
-  cw_key(key_release)
+  cw_key(key_open)
   time.sleep(ditspeed)
 
 def dit():
-  cw_key(key_release)
-  cw_key(key_press)
+  cw_key(key_open)
+  cw_key(key_close)
   time.sleep(ditspeed)
-  cw_key(key_release)
+  cw_key(key_open)
   time.sleep(ditspeed)
 
 def word(w):
@@ -104,11 +104,11 @@ else:
   cw_key = ser.setRTS
 
 if args.invert:
-  key_press = False
-  key_release = True
+  key_close = False
+  key_open = True
 else:
-  key_press = True
-  key_release = False
+  key_close = True
+  key_open = False
 
 ditspeed = (1200.0 / float(args.wpm)) / 1000.0
 dahspeed = ditspeed * 3
