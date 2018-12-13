@@ -6,3 +6,4 @@ cwkeyer is a python based serial cw keyer for use with generic serial interfaces
 -w CW keying speed in words per minutes. default: 20 wpm  
 -t Text to transmit. Surround multiple words by quotes.  
 --dtr Use DTR pin instead of RTS pin for keying. default is to use RTS  
+--invert Invert the logic of setting pin - used in the event that your serial has hi/low backwards 
