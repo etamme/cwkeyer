@@ -45,6 +45,11 @@ chars =   {'A':'.-',
            '/':'-..-.'
            }
 
+cut_nums = {
+            '1':'.-',
+            '9':'-.',
+            '0':'-'
+           }
 
 def gap():
   time.sleep(charspace)
@@ -96,6 +101,7 @@ parser.add_argument('-w', '--wpm', dest='wpm', type=int, default=20, help='CW ke
 parser.add_argument('-t', '--text', dest='text', required=True, help='Text to transmit. Surround multiple words by quotes.')
 parser.add_argument('--dtr', dest='dtr', action='store_true', help='Use DTR pin instead of RTS pin for keying.')
 parser.add_argument('--invert', dest='invert', action='store_true', help='Invert logic signals on pin used for keying.')
+parser.add_argument('--cut-nums',dest='cutnums',action='store_true',help='Use contest-style abbreviated numbers.')
 args = parser.parse_args()
 
 ser = serial.Serial(args.device, 9600)
@@ -110,6 +116,9 @@ if args.invert:
 else:
   key_close = True
   key_open = False
+
+if args.cutnums:
+  chars.update(cut_nums)
 
 ditspeed = (1200.0 / float(args.wpm)) / 1000.0
 dahspeed = ditspeed * 3
