@@ -53,13 +53,15 @@ cut_nums = {
 
 class cw_text_parser:
   def __init__(self, wpm):
-    self.recalculate_speeds(wpm)
+    # FIXME: Check if we really need float() here
+    self.wpm = float(wpm)
+    self.recalculate_speeds()
 
-  def recalculate_speeds(self, wpm):
-    self.ditspeed = (1200.0 / float(wpm)) / 1000.0
-    self.dahspeed = ((1200.0 / float(wpm)) / 1000.0) * 3
-    self.charspace = ((1200.0 / float(wpm)) / 1000.0) * 1
-    self.wordspace = ((1200.0 / float(wpm)) / 1000.0) * 7
+  def recalculate_speeds(self):
+    self.ditspeed = (1200. / self.wpm) / 1000.
+    self.dahspeed = ((1200. / self.wpm) / 1000.) * 3
+    self.charspace = ((1200. / self.wpm) / 1000.) * 1
+    self.wordspace = ((1200. / self.wpm) / 1000.) * 7
 
   def wait_charspace(self):
     # sleep between characters
@@ -77,7 +79,7 @@ class cw_text_parser:
     cw_key(key_open)
     time.sleep(space_time)
 
-  def word(self, w, wpm):
+  def word(self, w):
     i=0
     while i < len(w):
       c=w[i]
@@ -92,10 +94,10 @@ class cw_text_parser:
         while True:
           if macro == "+" or macro == "-":
             if macro == "+":
-              wpm+=5
+              self.wpm += 5
             else:
-              wpm+=-5
-            self.recalculate_speeds(wpm)
+              self.wpm += -5
+            self.recalculate_speeds()
             #reset current macro command
             macro = ""
           elif macro == ">":
@@ -159,4 +161,4 @@ if args.cutnums:
 # iterate over the passed string as individual words
 p = cw_text_parser(args.wpm)
 for w in args.text.upper().split():
-  p.word(w, args.wpm)
+  p.word(w)
