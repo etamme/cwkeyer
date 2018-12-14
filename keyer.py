@@ -3,91 +3,133 @@ import sys
 import serial
 import argparse
 
-chars =   {'A':'.-',
-           'B':'-...',
-           'C':'-.-.',
-           'D':'-..',
+chars =   {'A':'._',
+           'B':'_...',
+           'C':'_._.',
+           'D':'_..',
            'E':'.',
-           'F':'..-.',
-           'G':'--.',
+           'F':'.._.',
+           'G':'__.',
            'H':'....',
            'I':'..',
-           'J':'.---',
-           'K':'-.-',
-           'L':'.-..',
-           'M':'--',
-           'N':'-.',
-           'O':'---',
-           'P':'.--.',
-           'Q':'--.-',
-           'R':'.-.',
+           'J':'.___',
+           'K':'_._',
+           'L':'._..',
+           'M':'__',
+           'N':'_.',
+           'O':'___',
+           'P':'.__.',
+           'Q':'__._',
+           'R':'._.',
            'S':'...',
-           'T':'-',
-           'U':'..-',
-           'V':'...-',
-           'W':'.--',
-           'X':'-..-',
-           'Y':'-.--',
-           'Z':'--..',
-           '0':'-----',
-           '1':'.----',
-           '2':'..---',
-           '3':'...--',
-           '4':'....-',
+           'T':'_',
+           'U':'.._',
+           'V':'..._',
+           'W':'.__',
+           'X':'_.._',
+           'Y':'_.__',
+           'Z':'__..',
+           '0':'_____',
+           '1':'.____',
+           '2':'..___',
+           '3':'...__',
+           '4':'...._',
            '5':'.....',
-           '6':'-....',
-           '7':'--...',
-           '8':'---..',
-           '9':'----.',
-           '?':'..--..',
-	   '.':'.-.-.-',
-           ',':'--..--',
-           '/':'-..-.'
+           '6':'_....',
+           '7':'__...',
+           '8':'___..',
+           '9':'____.',
+           '?':'..__..',
+	   '.':'._._._',
+           ',':'__..__',
+           '/':'_.._.'
            }
 
 cut_nums = {
-            '1':'.-',
-            '9':'-.',
-            '0':'-'
+            '1':'._',
+            '9':'_.',
+            '0':'_'
            }
 
-def gap():
-  time.sleep(charspace)
+# sleep for the given amount of time
+def space(duration):
+  time.sleep(duration)
 
-def wordgap():
-  time.sleep(wordspace)
-
-def dah():
+# keydown for "duration" time, and pad after with "gap" time
+def key(duration,ditspeed):
   cw_key(key_open)
   cw_key(key_close)
-  time.sleep(dahspeed)
+  time.sleep(duration)
   cw_key(key_open)
   time.sleep(ditspeed)
 
-def dit():
-  cw_key(key_open)
-  cw_key(key_close)
-  time.sleep(ditspeed)
-  cw_key(key_open)
-  time.sleep(ditspeed)
+def calcdit(wpm):
+  return (1200.0 / float(wpm)) / 1000.0
 
-def word(w):
-  for c in w:
+def calcdah(wpm):
+  return ((1200.0 / float(wpm)) / 1000.0) * 3
+
+def calcchar(wpm):
+  return ((1200.0 / float(wpm)) / 1000.0) * 1
+
+def calcword(wpm):
+  return ((1200.0 / float(wpm)) / 1000.0) * 7
+
+def word(w,wpm):
+  # setup initial speeds for this word
+  ditspeed = calcdit(wpm)
+  dahspeed = calcdah(wpm)
+  charspace = calcchar(wpm)
+  wordspace = calcword(wpm)
+  i=0
+  while i < len(w):
+    c=w[i]
+    # catch a new macro escape
+    if c == "<":
+      # setup the first char of the macro past the macro escape char '<'
+      i+=1
+      macro=w[i]
+      # loop matching macro commands, till we find '>'
+      # each time a macro "match" is found, execute it
+      # then reset the macro command, and increment index
+      while True:
+        if macro == "+" or macro == "-":
+          if macro == "+":
+            wpm+=5
+          else:
+            wpm+=-5
+          ditspeed = calcdit(wpm)
+          dahspeed = calcdah(wpm)
+          charspace = calcchar(wpm)
+          wordspace = calcword(wpm)
+          #reset current macro command
+          macro = ""
+        elif macro == ">":
+          #break out of the while loop
+          if i < len(w)-1:
+            i+=1
+            c=w[i]
+          break
+        i+=1
+        macro = macro + str(w[i])
+    else:
       try:
-          code = chars[c]
+        code = chars[c]
+        i+=1
       except KeyError:
-          # FIXME: Use proper logging facility here
-          print('Skipping unknown character %s' % c)
-          continue
+        # skip unknown chars
+        i+=1
+        continue
 
       for dahdit in code:
-        if dahdit == '-':
-          dah()
+        if dahdit == '_':
+          key(dahspeed,charspace)
         else:
-          dit()
-      gap()
-  wordgap()
+          key(ditspeed,charspace)
+      space(charspace)
+  space(wordspace)
 
+# this is for diagnostic purposes only
 def paris():
   count=0
   while True:
@@ -120,10 +162,6 @@ else:
 if args.cutnums:
   chars.update(cut_nums)
 
-ditspeed = (1200.0 / float(args.wpm)) / 1000.0
-dahspeed = ditspeed * 3
-charspace = ditspeed * 1
-wordspace = ditspeed * 7
-
+# iterate over the passed string as individual words
 for w in args.text.upper().split():
-   word(w)
+   word(w,args.wpm)
