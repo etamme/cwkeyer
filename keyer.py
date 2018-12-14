@@ -77,7 +77,7 @@ class cw_text_parser:
     time.sleep(self.wordspace)
 
   # keydown for "duration" time, and pad after with "gap" time
-  def key(self, keydown_time, space_time):
+  def key(self, keydown_time):
     cw_key(key_open)
     cw_key(key_close)
     time.sleep(keydown_time)
@@ -104,6 +104,17 @@ class cw_text_parser:
             self.recalculate_speeds()
             #reset current macro command
             macro = ""
+          elif macro=="BT":
+            self.key(self.dahspeed)
+            self.wait_intracharspace()
+            self.key(self.ditspeed)
+            self.wait_intracharspace()
+            self.key(self.ditspeed)
+            self.wait_intracharspace()
+            self.key(self.ditspeed)
+            self.wait_intracharspace()
+            self.key(self.dahspeed)
+            macro=""
           elif macro == ">":
             #break out of the while loop
             if i < len(w)-1:
@@ -125,9 +136,9 @@ class cw_text_parser:
         while codeidx < len(code):
           dahdit=code[codeidx]
           if dahdit == '_':
-            self.key(self.dahspeed, self.charspace)
+            self.key(self.dahspeed)
           else:
-            self.key(self.ditspeed, self.charspace)
+            self.key(self.ditspeed)
           # include intRA char spacing unless this is the last dah/dit
           if codeidx < len(code)-1:
             self.wait_intracharspace()
