@@ -51,83 +51,87 @@ cut_nums = {
             '0':'_'
            }
 
-# sleep for the given amount of time
-def space(duration):
-  time.sleep(duration)
+class cw_text_parser:
+  def __init__(self):
+    pass
 
-# keydown for "duration" time, and pad after with "gap" time
-def key(duration,ditspeed):
-  cw_key(key_open)
-  cw_key(key_close)
-  time.sleep(duration)
-  cw_key(key_open)
-  time.sleep(ditspeed)
+  # sleep for the given amount of time
+  def space(self, duration):
+    time.sleep(duration)
 
-def calcdit(wpm):
-  return (1200.0 / float(wpm)) / 1000.0
+  # keydown for "duration" time, and pad after with "gap" time
+  def key(self, duration, ditspeed):
+    cw_key(key_open)
+    cw_key(key_close)
+    time.sleep(duration)
+    cw_key(key_open)
+    time.sleep(ditspeed)
 
-def calcdah(wpm):
-  return ((1200.0 / float(wpm)) / 1000.0) * 3
+  def calcdit(self, wpm):
+    return (1200.0 / float(wpm)) / 1000.0
 
-def calcchar(wpm):
-  return ((1200.0 / float(wpm)) / 1000.0) * 1
+  def calcdah(self, wpm):
+    return ((1200.0 / float(wpm)) / 1000.0) * 3
 
-def calcword(wpm):
-  return ((1200.0 / float(wpm)) / 1000.0) * 7
+  def calcchar(self, wpm):
+    return ((1200.0 / float(wpm)) / 1000.0) * 1
 
-def word(w,wpm):
-  # setup initial speeds for this word
-  ditspeed = calcdit(wpm)
-  dahspeed = calcdah(wpm)
-  charspace = calcchar(wpm)
-  wordspace = calcword(wpm)
-  i=0
-  while i < len(w):
-    c=w[i]
-    # catch a new macro escape
-    if c == "<":
-      # setup the first char of the macro past the macro escape char '<'
-      i+=1
-      macro=w[i]
-      # loop matching macro commands, till we find '>'
-      # each time a macro "match" is found, execute it
-      # then reset the macro command, and increment index
-      while True:
-        if macro == "+" or macro == "-":
-          if macro == "+":
-            wpm+=5
+  def calcword(self, wpm):
+    return ((1200.0 / float(wpm)) / 1000.0) * 7
+
+  def word(self, w, wpm):
+    # setup initial speeds for this word
+    ditspeed = self.calcdit(wpm)
+    dahspeed = self.calcdah(wpm)
+    charspace = self.calcchar(wpm)
+    wordspace = self.calcword(wpm)
+    i=0
+    while i < len(w):
+      c=w[i]
+      # catch a new macro escape
+      if c == "<":
+        # setup the first char of the macro past the macro escape char '<'
+        i+=1
+        macro=w[i]
+        # loop matching macro commands, till we find '>'
+        # each time a macro "match" is found, execute it
+        # then reset the macro command, and increment index
+        while True:
+          if macro == "+" or macro == "-":
+            if macro == "+":
+              wpm+=5
+            else:
+              wpm+=-5
+            ditspeed = self.calcdit(wpm)
+            dahspeed = self.calcdah(wpm)
+            charspace = self.calcchar(wpm)
+            wordspace = self.calcword(wpm)
+            #reset current macro command
+            macro = ""
+          elif macro == ">":
+            #break out of the while loop
+            if i < len(w)-1:
+              i+=1
+              c=w[i]
+            break
+          i+=1
+          macro = macro + str(w[i])
+      else:
+        try:
+          code = chars[c]
+          i+=1
+        except KeyError:
+          # skip unknown chars
+          i+=1
+          continue
+
+        for dahdit in code:
+          if dahdit == '_':
+            self.key(dahspeed, charspace)
           else:
-            wpm+=-5
-          ditspeed = calcdit(wpm)
-          dahspeed = calcdah(wpm)
-          charspace = calcchar(wpm)
-          wordspace = calcword(wpm)
-          #reset current macro command
-          macro = ""
-        elif macro == ">":
-          #break out of the while loop
-          if i < len(w)-1:
-            i+=1
-            c=w[i]
-          break
-        i+=1
-        macro = macro + str(w[i])
-    else:
-      try:
-        code = chars[c]
-        i+=1
-      except KeyError:
-        # skip unknown chars
-        i+=1
-        continue
-
-      for dahdit in code:
-        if dahdit == '_':
-          key(dahspeed,charspace)
-        else:
-          key(ditspeed,charspace)
-      space(charspace)
-  space(wordspace)
+            self.key(ditspeed, charspace)
+        self.space(charspace)
+    self.space(wordspace)
 
 # this is for diagnostic purposes only
 def paris():
@@ -163,5 +167,6 @@ if args.cutnums:
   chars.update(cut_nums)
 
 # iterate over the passed string as individual words
+p = cw_text_parser()
 for w in args.text.upper().split():
-   word(w,args.wpm)
+   p.word(w, args.wpm)
