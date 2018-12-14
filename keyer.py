@@ -61,9 +61,13 @@ class cw_text_parser:
     self.charspace = ((1200.0 / float(wpm)) / 1000.0) * 1
     self.wordspace = ((1200.0 / float(wpm)) / 1000.0) * 7
 
-  # sleep for the given amount of time
-  def space(self, duration):
-    time.sleep(duration)
+  def wait_charspace(self):
+    # sleep between characters
+    time.sleep(self.charspace)
+
+  def wait_wordspace(self):
+    # sleep between words
+    time.sleep(self.wordspace)
 
   # keydown for "duration" time, and pad after with "gap" time
   def key(self, keydown_time, space_time):
@@ -116,8 +120,8 @@ class cw_text_parser:
             self.key(self.dahspeed, self.charspace)
           else:
             self.key(self.ditspeed, self.charspace)
-        self.space(self.charspace)
-    self.space(self.wordspace)
+        self.wait_charspace()
+    self.wait_wordspace()
 
 # this is for diagnostic purposes only
 def paris():
