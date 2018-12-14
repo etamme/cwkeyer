@@ -66,12 +66,12 @@ class cw_text_parser:
     time.sleep(duration)
 
   # keydown for "duration" time, and pad after with "gap" time
-  def key(self, duration, ditspeed):
+  def key(self, keydown_time, space_time):
     cw_key(key_open)
     cw_key(key_close)
-    time.sleep(duration)
+    time.sleep(keydown_time)
     cw_key(key_open)
-    time.sleep(ditspeed)
+    time.sleep(space_time)
 
   def word(self, w, wpm):
     i=0
