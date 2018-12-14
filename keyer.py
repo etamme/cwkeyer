@@ -59,13 +59,18 @@ class cw_text_parser:
 
   def recalculate_speeds(self):
     self.ditspeed = (1200. / self.wpm) / 1000.
-    self.dahspeed = ((1200. / self.wpm) / 1000.) * 3
-    self.charspace = ((1200. / self.wpm) / 1000.) * 1
-    self.wordspace = ((1200. / self.wpm) / 1000.) * 7
+    self.dahspeed = self.ditspeed * 3
+    self.charspace = self.dahspeed
+    self.intracharspace = self.ditspeed
+    self.wordspace = self.ditspeed * 7
 
   def wait_charspace(self):
     # sleep between characters
     time.sleep(self.charspace)
+
+  def wait_intracharspace(self):
+    # sleep between dits and dahs within a character
+    time.sleep(self.intracharspace)
 
   def wait_wordspace(self):
     # sleep between words
@@ -77,7 +82,6 @@ class cw_text_parser:
     cw_key(key_close)
     time.sleep(keydown_time)
     cw_key(key_open)
-    time.sleep(space_time)
 
   def word(self, w):
     i=0
@@ -117,12 +121,20 @@ class cw_text_parser:
           i+=1
           continue
 
-        for dahdit in code:
+        codeidx=0
+        while codeidx < len(code):
+          dahdit=code[codeidx]
           if dahdit == '_':
             self.key(self.dahspeed, self.charspace)
           else:
             self.key(self.ditspeed, self.charspace)
-        self.wait_charspace()
+          # include intRA char spacing unless this is the last dah/dit
+          if codeidx < len(code)-1:
+            self.wait_intracharspace()
+          codeidx+=1
+        # include intER char spacing unless this is the last char in the word
+        if i < len(w):
+          self.wait_charspace()
     self.wait_wordspace()
 
 # this is for diagnostic purposes only
