@@ -169,4 +169,4 @@ if args.cutnums:
 # iterate over the passed string as individual words
 p = cw_text_parser()
 for w in args.text.upper().split():
-   p.word(w, args.wpm)
+  p.word(w, args.wpm)
