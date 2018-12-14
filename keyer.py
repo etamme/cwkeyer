@@ -52,8 +52,14 @@ cut_nums = {
            }
 
 class cw_text_parser:
-  def __init__(self):
-    pass
+  def __init__(self, wpm):
+    self.recalculate_speeds(wpm)
+
+  def recalculate_speeds(self, wpm):
+    self.ditspeed = (1200.0 / float(wpm)) / 1000.0
+    self.dahspeed = ((1200.0 / float(wpm)) / 1000.0) * 3
+    self.charspace = ((1200.0 / float(wpm)) / 1000.0) * 1
+    self.wordspace = ((1200.0 / float(wpm)) / 1000.0) * 7
 
   # sleep for the given amount of time
   def space(self, duration):
@@ -67,24 +73,7 @@ class cw_text_parser:
     cw_key(key_open)
     time.sleep(ditspeed)
 
-  def calcdit(self, wpm):
-    return (1200.0 / float(wpm)) / 1000.0
-
-  def calcdah(self, wpm):
-    return ((1200.0 / float(wpm)) / 1000.0) * 3
-
-  def calcchar(self, wpm):
-    return ((1200.0 / float(wpm)) / 1000.0) * 1
-
-  def calcword(self, wpm):
-    return ((1200.0 / float(wpm)) / 1000.0) * 7
-
   def word(self, w, wpm):
-    # setup initial speeds for this word
-    ditspeed = self.calcdit(wpm)
-    dahspeed = self.calcdah(wpm)
-    charspace = self.calcchar(wpm)
-    wordspace = self.calcword(wpm)
     i=0
     while i < len(w):
       c=w[i]
@@ -102,10 +91,7 @@ class cw_text_parser:
               wpm+=5
             else:
               wpm+=-5
-            ditspeed = self.calcdit(wpm)
-            dahspeed = self.calcdah(wpm)
-            charspace = self.calcchar(wpm)
-            wordspace = self.calcword(wpm)
+            self.recalculate_speeds(wpm)
             #reset current macro command
             macro = ""
           elif macro == ">":
@@ -127,11 +113,11 @@ class cw_text_parser:
 
         for dahdit in code:
           if dahdit == '_':
-            self.key(dahspeed, charspace)
+            self.key(self.dahspeed, self.charspace)
           else:
-            self.key(ditspeed, charspace)
-        self.space(charspace)
-    self.space(wordspace)
+            self.key(self.ditspeed, self.charspace)
+        self.space(self.charspace)
+    self.space(self.wordspace)
 
 # this is for diagnostic purposes only
 def paris():
@@ -167,6 +153,6 @@ if args.cutnums:
   chars.update(cut_nums)
 
 # iterate over the passed string as individual words
-p = cw_text_parser()
+p = cw_text_parser(args.wpm)
 for w in args.text.upper().split():
   p.word(w, args.wpm)
