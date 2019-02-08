@@ -1,3 +1,4 @@
+from RPi import GPIO
 import time
 import sys
 import serial
@@ -51,9 +52,43 @@ cut_nums = {
             '0':'_'
            }
 
-class cw_text_parser:
+class Paddles(object):
+  def __init__(self):
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(LEFT_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.setup(RIGHT_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+
+  def dit_paddle(self):
+    return not GPIO.input(LEFT_PIN)
+
+  def dah_paddle(self):
+    return not GPIO.input(RIGHT_PIN)
+
+class IambicKeyer(object):
+  def __init__(self):
+    self.last = BLANK
+  def send_dit(self):
+    self.last = DIT
+  def send_dah(self):
+    self.last = DAH
+
+  def send_next(self, left, right):
+    if left and right:
+        if self.last == DIT:
+            self.send_dah()
+        elif self.last == DAH:
+            self.send_dit()
+        else:
+            self.send_dah()
+    elif left:
+        self.send_dit()
+    elif right:
+        self.send_dah()
+    else:
+        self.send_blank()
+
+class CWKeyer:
   def __init__(self, wpm):
-    # FIXME: Check if we really need float() here
     self.wpm = float(wpm)
     self.recalculate_speeds()
 
@@ -76,12 +111,23 @@ class cw_text_parser:
     # sleep between words
     time.sleep(self.wordspace)
 
+  def key_dah():
+    self.key(dahspeed)
+
+  def key_dit():
+    self.key(ditspeed)
+
   # keydown for "duration" time, and pad after with "gap" time
   def key(self, keydown_time):
     cw_key(key_open)
     cw_key(key_close)
     time.sleep(keydown_time)
     cw_key(key_open)
+
+class cw_text_parser:
+  def __init__(self, wpm):
+    self.keyer=CWKeyer(wpm)
+
 
   def word(self, w):
     i=0
@@ -163,6 +209,7 @@ parser.add_argument('-t', '--text', dest='text', required=True, help='Text to tr
 parser.add_argument('--dtr', dest='dtr', action='store_true', help='Use DTR pin instead of RTS pin for keying.')
 parser.add_argument('--invert', dest='invert', action='store_true', help='Invert logic signals on pin used for keying.')
 parser.add_argument('--cut-nums',dest='cutnums',action='store_true',help='Use contest-style abbreviated numbers.')
+parser.add_argument('-k','--keyer' ,dest='keyer',action='store_true',help='Run as keyer daemon for use with paddles')
 args = parser.parse_args()
 
 ser = serial.Serial(args.device, 9600)
@@ -180,6 +227,8 @@ else:
 
 if args.cutnums:
   chars.update(cut_nums)
+if args.keyer = True:
+  p = Paddles()
 
 # iterate over the passed string as individual words
 p = cw_text_parser(args.wpm)
