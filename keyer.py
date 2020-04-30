@@ -115,6 +115,22 @@ class cw_text_parser:
             self.wait_intracharspace()
             self.key(self.dahspeed)
             macro=""
+          elif macro=="BK":
+            self.key(self.dahspeed)
+            self.wait_intracharspace()
+            self.key(self.ditspeed)
+            self.wait_intracharspace()
+            self.key(self.ditspeed)
+            self.wait_intracharspace()
+            self.key(self.ditspeed)
+            self.wait_intracharspace()
+            self.key(self.dahspeed)
+            self.wait_intracharspace()
+            self.key(self.ditspeed)
+            self.wait_intracharspace()
+            self.key(self.dahspeed)
+            macro=""
+
           elif macro == ">":
             #break out of the while loop
             if i < len(w)-1:
