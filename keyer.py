@@ -173,6 +173,7 @@ def paris():
     print(count)
 
 parser = argparse.ArgumentParser(description='CW keyer for serial interface.')
+parser.add_argument('-o', '--off', dest='off', action='store_true', help='one command shot to open the key')
 parser.add_argument('-d', '--device', dest='device', default='/dev/ttyUSB0', help='Path to serial device. (default: /dev/ttyUSB0)')
 parser.add_argument('-w', '--wpm', dest='wpm', type=int, default=20, help='CW keying speed in words per minutes. (default: 20 wpm)')
 parser.add_argument('-t', '--text', dest='text', required=True, help='Text to transmit. Surround multiple words by quotes.')
@@ -196,6 +197,10 @@ else:
 
 if args.cutnums:
   chars.update(cut_nums)
+
+if args.off:
+    cw_key(key_open)
+    exit()
 
 # iterate over the passed string as individual words
 p = cw_text_parser(args.wpm)
